@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Agent</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-logo">✨</div>
+        <div class="brand-title">Image Agent</div>
+      </div>
+      <div class="header-actions">
+        <div class="status-indicators">
+          <span id="dtStatus" class="status-pill status-checking" title="Проверка Draw Things">
+            <span class="dot"></span> Draw Things
+          </span>
+          <span id="bonsaiStatus" class="status-pill status-checking" title="Проверка Bonsai 2">
+            <span class="dot"></span> Bonsai 2
+          </span>
+        </div>
+        <button id="historyBtn" class="icon-button" title="История генераций">
+          🕒 История
+        </button>
+      </div>
+    </header>
+
+    <!-- Service Alert Banner (Hidden by default) -->
+    <div id="serviceAlert" class="service-alert hidden">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-content">
+        <div id="alertTitle" class="alert-title">Draw Things не запущен</div>
+        <div id="alertDesc" class="alert-desc">Открой Draw Things и включи API Server (HTTP :7860).</div>
+      </div>
+    </div>
+
+    <!-- Main Generator Card -->
+    <main class="main-card">
+      <div class="input-section">
+        <label for="promptInput" class="input-label">Что хочешь получить?</label>
+        <textarea 
+          id="promptInput" 
+          class="prompt-textarea" 
+          placeholder="Опиши изображение обычными словами... Например: Сделай реалистичную журнальную фотографию девушки в уютном кафе, утренний мягкий свет, глубина резкости"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <!-- Attachment Reference (Disabled placeholder) -->
+      <div class="attachment-row">
+        <button class="attachment-btn disabled" disabled title="Функция Image-to-Image будет доступна в следующем обновлении">
+          <span>+ Добавить изображение</span>
+          <span class="badge-soon">Скоро</span>
+        </button>
+      </div>
+
+      <!-- Controls Row: Format, Quality, and Action -->
+      <div class="controls-row">
+        <!-- Format Selector -->
+        <div class="segmented-control" id="formatSelector" role="radiogroup" aria-label="Формат">
+          <button class="segment-btn active" data-format="auto">Auto</button>
+          <button class="segment-btn" data-format="square">Квадрат</button>
+          <button class="segment-btn" data-format="vertical">Вертикально</button>
+          <button class="segment-btn" data-format="horizontal">Горизонтально</button>
+        </div>
+
+        <!-- Quality Selector -->
+        <div class="segmented-control" id="qualitySelector" role="radiogroup" aria-label="Качество">
+          <button class="segment-btn active" data-quality="draft">Черновик</button>
+          <button class="segment-btn" data-quality="final">Финал</button>
+        </div>
+
+        <!-- Main Action Button -->
+        <button id="generateBtn" class="primary-btn">
+          <span>Создать</span>
+        </button>
+      </div>
+
+      <!-- Advanced Disclosure -->
+      <div class="advanced-section">
+        <button id="advancedToggle" class="advanced-toggle" type="button">
+          <span class="toggle-icon">▸</span>
+          <span>Расширенные настройки (Advanced)</span>
+        </button>
+        
+        <div id="advancedContent" class="advanced-content collapsed">
+          <div class="advanced-grid">
+            <div class="adv-field full-width">
+              <label for="advPreparedPrompt">Подготовленный промпт (переопределяет автоплан):</label>
+              <textarea id="advPreparedPrompt" placeholder="Оставьте пустым для автоматического планирования Bonsai" rows="2"></textarea>
+            </div>
+            <div class="adv-field full-width">
+              <label for="advNegPrompt">Отрицательный промпт (Negative):</label>
+              <input type="text" id="advNegPrompt" placeholder="Оставьте пустым для авто-настройки">
+            </div>
+            <div class="adv-field">
+              <label for="advSeed">Seed (-1 = случайный):</label>
+              <input type="number" id="advSeed" value="-1">
+            </div>
+            <div class="adv-field">
+              <label for="advSteps">Steps (шаги):</label>
+              <input type="number" id="advSteps" value="8" min="4" max="25">
+            </div>
+            <div class="adv-field">
+              <label for="advWidth">Ширина (px):</label>
+              <input type="number" id="advWidth" placeholder="Авто">
+            </div>
+            <div class="adv-field">
+              <label for="advHeight">Высота (px):</label>
+              <input type="number" id="advHeight" placeholder="Авто">
+            </div>
+            <div class="adv-field">
+              <label for="advRealismLora">Realism LoRA (0 - 1.0):</label>
+              <input type="number" id="advRealismLora" step="0.05" min="0" max="1.5" placeholder="Авто">
+            </div>
+            <div class="adv-field">
+              <label for="advNsfwLora">Unrestricted LoRA (0 - 1.0):</label>
+              <input type="number" id="advNsfwLora" step="0.05" min="0" max="1.5" placeholder="Авто">
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Progress & Status Card -->
+    <section id="progressSection" class="progress-section hidden">
+      <div class="progress-header">
+        <div class="progress-info">
+          <span class="spinner"></span>
+          <span id="progressText" class="progress-text">Подготавливаю промпт...</span>
+          <span id="unrestrictedBadge" class="badge-unrestricted hidden">Unrestricted</span>
+        </div>
+        <button id="cancelBtn" class="cancel-btn">Отменить</button>
+      </div>
+      <div class="progress-bar-container">
+        <div id="progressBar" class="progress-bar" style="width: 0%;"></div>
+      </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="resultsSection" class="results-section">
+      <div class="results-header">
+        <h2 id="resultsTitle" class="results-title">Результаты</h2>
+        <div class="results-meta">
+          <span id="resultsCount">0 из 4</span>
+          <button id="detailsBtn" class="text-link-btn hidden">Подробнее о параметрах</button>
+        </div>
+      </div>
+
+      <div class="results-grid" id="resultsGrid">
+        <!-- 4 Card Slots -->
+        <div class="image-card placeholder" data-slot="1">
+          <div class="card-inner">
+            <div class="slot-loader">1</div>
+          </div>
+        </div>
+        <div class="image-card placeholder" data-slot="2">
+          <div class="card-inner">
+            <div class="slot-loader">2</div>
+          </div>
+        </div>
+        <div class="image-card placeholder" data-slot="3">
+          <div class="card-inner">
+            <div class="slot-loader">3</div>
+          </div>
+        </div>
+        <div class="image-card placeholder" data-slot="4">
+          <div class="card-inner">
+            <div class="slot-loader">4</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Details Modal -->
+    <div id="detailsModal" class="modal hidden">
+      <div class="modal-backdrop"></div>
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3>Параметры генерации</h3>
+          <button id="closeDetailsModal" class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body" id="detailsContent">
+          <!-- Dynamic details -->
+        </div>
+      </div>
+    </div>
+
+    <!-- History Drawer -->
+    <aside id="historyDrawer" class="history-drawer hidden">
+      <div class="drawer-header">
+        <h3>История генераций</h3>
+        <button id="closeHistoryBtn" class="close-btn">&times;</button>
+      </div>
+      <div class="drawer-body" id="historyList">
+        <!-- Dynamic history items -->
+      </div>
+    </aside>
+  </div>
+
+  <!-- Lightbox for full image view -->
+  <div id="lightbox" class="lightbox hidden">
+    <div class="lightbox-backdrop"></div>
+    <div class="lightbox-content">
+      <img id="lightboxImg" src="" alt="Full view">
+      <button id="closeLightbox" class="close-btn lightbox-close">&times;</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

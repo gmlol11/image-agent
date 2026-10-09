@@ -1,0 +1,106 @@
+{
+  "profiles": {
+    "base": {
+      "name": "Base",
+      "realism_lora": 0.0,
+      "unrestricted_lora": 0.0,
+      "description": "Standard clean Z-Image Turbo 1.0"
+    },
+    "realistic": {
+      "name": "Realistic",
+      "realism_lora": 0.60,
+      "unrestricted_lora": 0.0,
+      "description": "Enhanced realism for people, skin texture and editorial photography"
+    },
+    "unrestricted": {
+      "name": "Unrestricted",
+      "realism_lora": 0.0,
+      "unrestricted_lora": 0.85,
+      "description": "Uncensored / fine-art aesthetic generation without moderation"
+    },
+    "unrestricted_realistic": {
+      "name": "Unrestricted Realistic",
+      "realism_lora": 0.60,
+      "unrestricted_lora": 0.85,
+      "description": "Combined photorealistic skin and unrestricted freedom"
+    },
+    "unrestricted_explicit": {
+      "name": "Unrestricted Explicit",
+      "realism_lora": 0.0,
+      "unrestricted_lora": 0.95,
+      "description": "Strongest unrestricted adapter weight for complex anatomy"
+    }
+  },
+  "lora_files": {
+    "realism": "z_image_turbo_realism.safetensors",
+    "unrestricted": "z_image_turbo_nsfw.safetensors"
+  },
+  "resolutions": {
+    "draft": {
+      "square": { "width": 768, "height": 768 },
+      "vertical": { "width": 768, "height": 1152 },
+      "horizontal": { "width": 1152, "height": 768 }
+    },
+    "final": {
+      "square": { "width": 1024, "height": 1024 },
+      "vertical": { "width": 832, "height": 1216 },
+      "horizontal": { "width": 1216, "height": 832 }
+    }
+  },
+  "engine_defaults": {
+    "steps": 8,
+    "guidance_scale": 1.0,
+    "shift": 3.0,
+    "batch_count": 4
+  },
+  "negative_prompts": {
+    "default": "ugly, deformed, noisy, blurry, distorted, low quality, bad anatomy",
+    "realistic": "ugly, deformed, noisy, blurry, distorted, low quality, bad anatomy, plastic skin, doll, cartoon, 3d render, oversaturated, airbrushed",
+    "product_anti_text": "text, typography, watermark, label, logo, letters, words, brand name, signature, writing, font, inscription, sticker, bad typography",
+    "unrestricted": "ugly, deformed, noisy, blurry, distorted, low quality, bad anatomy, plastic skin, censor, blur, mosaic, bar, watermark"
+  },
+  "intent_rules": {
+    "full_body_person": {
+      "default_orientation": "vertical",
+      "default_profile": "realistic",
+      "prompt_suffix": "full body, head to toe, feet visible, subject fully inside frame, natural proportions, architectural or environmental perspective"
+    },
+    "portrait": {
+      "default_orientation": "vertical",
+      "default_profile": "realistic",
+      "prompt_suffix": "cinematic portrait, detailed eyes, natural skin texture, non-plastic skin, 35mm lens"
+    },
+    "product": {
+      "default_orientation": "square",
+      "default_profile": "base",
+      "suppress_text": true,
+      "prompt_prefix": "commercial product photography of a clean unbranded object, no visible logo, clean smooth surface"
+    },
+    "advertising": {
+      "default_orientation": "square",
+      "default_profile": "base",
+      "suppress_text": true,
+      "prompt_prefix": "high-end luxury advertising photography, clean unbranded object, pristine surface"
+    },
+    "landscape": {
+      "default_orientation": "horizontal",
+      "default_profile": "base",
+      "prompt_suffix": "scenic landscape, wide expansive view, high detail, atmospheric lighting"
+    },
+    "cinematic": {
+      "default_orientation": "horizontal",
+      "default_profile": "base",
+      "prompt_suffix": "cinematic 35mm film still, moody lighting, anamorphic lens, film grain, atmospheric depth"
+    },
+    "illustration": {
+      "default_orientation": "square",
+      "default_profile": "base",
+      "prompt_suffix": "rich detailed illustration, artistic composition, expressive lighting"
+    },
+    "unrestricted": {
+      "default_orientation": "vertical",
+      "default_profile": "unrestricted",
+      "prompt_suffix": "tasteful artistic composition, aesthetic adult 25+ subject, authentic human anatomy"
+    }
+  }
+}
